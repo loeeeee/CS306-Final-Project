@@ -80,6 +80,16 @@ The main application file:
 - Registers all screens
 - Handles screen transitions
 
+### 8. Usability and Layout Improvements (Latest Update)
+
+- **Readability:** Increased font sizes, improved color contrast (pure black for labels, white for button text), and bolded important headers for better visibility.
+- **Modern Card Layout:** The editor screen now uses a centered card-like panel with rounded corners and padding, separating the form from the background for a modern look.
+- **Better Alignment:** All form elements are aligned vertically, with labels above fields/buttons, and consistent spacing and padding throughout.
+- **Back Button Placement:** The Back button is now always visible at the top of the editor form, inside the scrollable area.
+- **Consistent Button Widths:** All action buttons are full-width and visually consistent.
+- **Window Size:** The default app window size is set to 900x900 pixels to ensure all elements are visible and not clipped on launch.
+- **General Polish:** Improved spacing, section separation, and overall user experience for clarity and ease of use.
+
 ## Technical Decisions
 
 1. **Layout System**
