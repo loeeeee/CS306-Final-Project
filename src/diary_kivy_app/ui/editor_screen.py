@@ -144,7 +144,11 @@ class EditorScreen(Screen):
             # Check for location updates every second
             Clock.schedule_interval(self._check_location, 1)
         else:
-            self.location_label.text = "Location service not available on this platform"
+            location = self.metadata_collector.get_current_location()
+            if location.get('error'):
+                self.location_label.text = location['error']
+            else:
+                self.location_label.text = "Location service not available on this platform"
 
     def _check_location(self, dt):
         """Check if location has been updated."""
@@ -164,12 +168,14 @@ class EditorScreen(Screen):
         if weather_data['temperature'] is not None:
             self.weather_label.text = f"{weather_data['temperature']}°C, {weather_data['humidity']}% humidity"
         else:
-            self.weather_label.text = f"{weather_data['description']} ({weather_data['platform']})"
+            self.weather_label.text = weather_data['description']
 
     def on_take_env_photo(self, instance):
         """Handle environment photo button press."""
         if not self.metadata_collector.take_photo(self._on_env_photo_taken):
-            self.env_photo_label.text = "Camera not available on this platform"
+            self.env_photo_label.text = "Camera not available on this platform. Please use the gallery option instead."
+            # Automatically switch to gallery mode
+            self.metadata_collector.take_photo(self._on_env_photo_taken, source='gallery')
 
     def _on_env_photo_taken(self, path):
         """Handle environment photo capture completion."""
@@ -184,7 +190,9 @@ class EditorScreen(Screen):
     def on_take_selfie(self, instance):
         """Handle selfie button press."""
         if not self.metadata_collector.take_photo(self._on_selfie_taken):
-            self.selfie_label.text = "Camera not available on this platform"
+            self.selfie_label.text = "Camera not available on this platform. Please use the gallery option instead."
+            # Automatically switch to gallery mode
+            self.metadata_collector.take_photo(self._on_selfie_taken, source='gallery')
 
     def _on_selfie_taken(self, path):
         """Handle selfie capture completion."""

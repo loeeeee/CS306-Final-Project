@@ -10,17 +10,25 @@ class MetadataCollector:
         self.camera = camera
         self.filechooser = filechooser
         self.current_location = None
+        self.platform = platform.system().lower()
         self._setup_gps()
 
     def _setup_gps(self):
         """Configure GPS settings."""
         try:
             self.gps.configure(on_location=self._on_location)
+            self.gps_available = True
         except NotImplementedError:
             print("GPS not available on this platform")
             self.gps_available = False
-        else:
-            self.gps_available = True
+            if self.platform == 'linux':
+                self.current_location = {
+                    'latitude': None,
+                    'longitude': None,
+                    'altitude': None,
+                    'timestamp': datetime.now().isoformat(),
+                    'error': 'GPS is not available on desktop platforms. This feature is designed for mobile devices.'
+                }
 
     def _on_location(self, **kwargs):
         """Callback for GPS location updates."""
@@ -59,7 +67,7 @@ class MetadataCollector:
                 'longitude': None,
                 'altitude': None,
                 'timestamp': datetime.now().isoformat(),
-                'error': 'GPS not available on this platform'
+                'error': 'GPS is not available on this platform. This feature is designed for mobile devices.'
             }
         return self.current_location
 
@@ -91,10 +99,9 @@ class MetadataCollector:
         Note: This is a placeholder as most devices don't have weather sensors.
         In a real implementation, you might want to use a weather API instead.
         """
-        # TODO: Implement actual weather sensor reading if available
         return {
             'temperature': None,
             'humidity': None,
-            'description': 'Weather data not available from sensors',
-            'platform': platform.system()
+            'description': 'Weather data is not available from sensors on this platform. Consider using a weather API for more accurate data.',
+            'platform': self.platform
         } 
