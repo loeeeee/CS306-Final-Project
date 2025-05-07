@@ -11,10 +11,19 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.widget import Widget
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.graphics import Color, RoundedRectangle
+from kivy.clock import Clock
+from ..core_logic.metadata_collector import MetadataCollector
+import os
+from datetime import datetime
+import platform
 
 class EditorScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.metadata_collector = MetadataCollector()
+        self.current_entry = None
+        self.env_photo_path = None
+        self.selfie_photo_path = None
         self.setup_ui()
 
     def setup_ui(self):
@@ -67,24 +76,32 @@ class EditorScreen(Screen):
 
         # Location
         metadata.add_widget(Label(text='Location', font_size=dp(15), halign='left', size_hint_y=None, height=dp(22), size_hint_x=1))
+        self.location_label = Label(text='Not set', size_hint_y=None, height=dp(20), size_hint_x=1)
+        metadata.add_widget(self.location_label)
         location_btn = Button(text='Get Location', size_hint_y=None, height=dp(40), size_hint_x=1)
         location_btn.bind(on_press=self.on_get_location)
         metadata.add_widget(location_btn)
 
         # Weather
         metadata.add_widget(Label(text='Weather', font_size=dp(15), halign='left', size_hint_y=None, height=dp(22), size_hint_x=1))
+        self.weather_label = Label(text='Not set', size_hint_y=None, height=dp(20), size_hint_x=1)
+        metadata.add_widget(self.weather_label)
         weather_btn = Button(text='Get Weather', size_hint_y=None, height=dp(40), size_hint_x=1)
         weather_btn.bind(on_press=self.on_get_weather)
         metadata.add_widget(weather_btn)
 
         # Environment Photo
         metadata.add_widget(Label(text='Environment Photo', font_size=dp(15), halign='left', size_hint_y=None, height=dp(22), size_hint_x=1))
+        self.env_photo_label = Label(text='Not set', size_hint_y=None, height=dp(20), size_hint_x=1)
+        metadata.add_widget(self.env_photo_label)
         env_photo_btn = Button(text='Take Environment Photo', size_hint_y=None, height=dp(40), size_hint_x=1)
         env_photo_btn.bind(on_press=self.on_take_env_photo)
         metadata.add_widget(env_photo_btn)
 
         # Selfie
         metadata.add_widget(Label(text='Selfie', font_size=dp(15), halign='left', size_hint_y=None, height=dp(22), size_hint_x=1))
+        self.selfie_label = Label(text='Not set', size_hint_y=None, height=dp(20), size_hint_x=1)
+        metadata.add_widget(self.selfie_label)
         selfie_btn = Button(text='Take Selfie', size_hint_y=None, height=dp(40), size_hint_x=1)
         selfie_btn.bind(on_press=self.on_take_selfie)
         metadata.add_widget(selfie_btn)
@@ -118,24 +135,73 @@ class EditorScreen(Screen):
         self.manager.current = 'main'
 
     def on_get_location(self, instance):
-        # TODO: Implement location fetching
-        pass
+        """Handle location button press."""
+        if self.metadata_collector.start_location_tracking():
+            self.location_label.text = "Getting location..."
+            # Check for location updates every second
+            Clock.schedule_interval(self._check_location, 1)
+        else:
+            self.location_label.text = "Location service not available on this platform"
+
+    def _check_location(self, dt):
+        """Check if location has been updated."""
+        location = self.metadata_collector.get_current_location()
+        if location.get('error'):
+            self.location_label.text = location['error']
+            return False
+        if location.get('latitude') is not None:
+            self.location_label.text = f"Lat: {location['latitude']:.4f}, Lon: {location['longitude']:.4f}"
+            self.metadata_collector.stop_location_tracking()
+            return False  # Stop checking
+        return True  # Keep checking
 
     def on_get_weather(self, instance):
-        # TODO: Implement weather fetching
-        pass
+        """Handle weather button press."""
+        weather_data = self.metadata_collector.get_weather_data()
+        if weather_data['temperature'] is not None:
+            self.weather_label.text = f"{weather_data['temperature']}°C, {weather_data['humidity']}% humidity"
+        else:
+            self.weather_label.text = f"{weather_data['description']} ({weather_data['platform']})"
 
     def on_take_env_photo(self, instance):
-        # TODO: Implement environment photo capture
-        pass
+        """Handle environment photo button press."""
+        if not self.metadata_collector.take_photo(self._on_env_photo_taken):
+            self.env_photo_label.text = "Camera not available on this platform"
+
+    def _on_env_photo_taken(self, path):
+        """Handle environment photo capture completion."""
+        if isinstance(path, list):  # File chooser returns a list
+            path = path[0]
+        if path:
+            self.env_photo_path = path
+            self.env_photo_label.text = "Photo taken"
+        else:
+            self.env_photo_label.text = "Failed to take photo"
 
     def on_take_selfie(self, instance):
-        # TODO: Implement selfie capture
-        pass
+        """Handle selfie button press."""
+        if not self.metadata_collector.take_photo(self._on_selfie_taken):
+            self.selfie_label.text = "Camera not available on this platform"
+
+    def _on_selfie_taken(self, path):
+        """Handle selfie capture completion."""
+        if isinstance(path, list):  # File chooser returns a list
+            path = path[0]
+        if path:
+            self.selfie_photo_path = path
+            self.selfie_label.text = "Selfie taken"
+        else:
+            self.selfie_label.text = "Failed to take selfie"
 
     def on_save(self, instance):
+        """Handle save button press."""
         # TODO: Implement save functionality
         self.manager.current = 'main'
 
     def on_cancel(self, instance):
-        self.manager.current = 'main' 
+        """Handle cancel button press."""
+        self.manager.current = 'main'
+
+    def on_leave(self):
+        """Clean up when leaving the screen."""
+        self.metadata_collector.stop_location_tracking() 
