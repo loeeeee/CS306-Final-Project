@@ -66,6 +66,11 @@ The app is built using Python and Kivy, making it available across multiple plat
 3. The main screen will display your diary entries (empty on first launch)
 
 ### Main Screen Navigation
+
+<p align="center">
+    <img src="../static/main.png" width=80% height=80%>
+</p>
+
 - **New Entry**: Tap the "+" button to create a new diary entry
 - **View Entry**: Tap on any existing entry to view its details
 - **Settings**: Access settings and export options through the menu button
@@ -73,6 +78,11 @@ The app is built using Python and Kivy, making it available across multiple plat
 ## Creating Diary Entries
 
 ### Basic Entry Creation
+
+<p align="center">
+    <img src="../static/edit.png" width=80% height=80%>
+</p>
+
 1. Tap the "+" button on the main screen
 2. Enter your diary text in the main text area
 3. Add metadata using the buttons below the text area:
@@ -83,6 +93,11 @@ The app is built using Python and Kivy, making it available across multiple plat
    - Song of the Day: Enter the title and artist
 
 ### Adding Photos
+
+<p align="center">
+    <img src="../static/edit-lower.png" width=80% height=80%>
+</p>
+
 1. Tap either the Environment Photo or Selfie button
 2. Choose between:
    - Take Photo: Opens the camera
@@ -97,6 +112,11 @@ The app is built using Python and Kivy, making it available across multiple plat
 ## Managing Entries
 
 ### Viewing Entries
+
+<p align="center">
+    <img src="../static/view.png" width=80% height=80%>
+</p>
+
 1. Tap any entry on the main screen
 2. View all content and metadata:
    - Diary text
@@ -117,6 +137,10 @@ The app is built using Python and Kivy, making it available across multiple plat
 3. Confirm the deletion in the popup dialog
 
 ## Exporting Your Diary
+
+<p align="center">
+    <img src="../static/settings.png" width=80% height=80%>
+</p>
 
 ### Creating an Export Bundle
 1. Open the Settings menu
