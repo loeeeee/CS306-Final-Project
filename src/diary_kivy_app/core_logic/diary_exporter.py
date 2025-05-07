@@ -19,6 +19,42 @@ class DiaryExporter:
         self.entries_dir = Path(entries_dir)
         self.media_dir = Path(media_dir)
         
+        # Ensure directories exist
+        self.entries_dir.mkdir(parents=True, exist_ok=True)
+        self.media_dir.mkdir(parents=True, exist_ok=True)
+    
+    def save_entry(self, entry_data: Dict[str, Any]) -> bool:
+        """
+        Save a diary entry to the entries directory.
+        
+        Args:
+            entry_data: Dictionary containing the entry data
+            
+        Returns:
+            bool: True if save was successful, False otherwise
+        """
+        try:
+            # Ensure entry has required fields
+            if not all(key in entry_data for key in ['entry_id', 'timestamp_created', 'timestamp_modified', 'text_content']):
+                raise ValueError("Entry data missing required fields")
+            
+            # Create filename from entry_id
+            filename = f"entry_{entry_data['entry_id']}.json"
+            file_path = self.entries_dir / filename
+            
+            # Add save timestamp
+            entry_data['timestamp_saved'] = datetime.now().isoformat()
+            
+            # Write entry to file
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(entry_data, f, indent=2, ensure_ascii=False)
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error saving entry: {str(e)}")
+            return False
+    
     def create_export_bundle(self, output_path: str) -> bool:
         """
         Create a ZIP bundle containing all diary entries and media files.
