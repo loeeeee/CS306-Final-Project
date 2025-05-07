@@ -1,7 +1,7 @@
 # Phase 5 Development Report: Diary Export Functionality
 
 ## Overview
-This report documents the implementation of Phase 5, which focused on developing the diary export functionality. The implementation includes a robust export system that packages diary entries and associated media files into a well-structured bundle, with comprehensive metadata tracking and error handling.
+This report documents the implementation of Phase 5, which focused on developing the diary export functionality and improving entry management. The implementation includes a robust export system, as well as full support for editing and deleting diary entries, with proper UI updates and data integrity.
 
 ## Implementation Details
 
@@ -19,42 +19,26 @@ Key features:
 - Individual entry saving functionality
 - Directory management
 
-### 2. Save Functionality
-The save functionality was implemented to handle individual diary entries:
+### 2. Entry Editing and Deletion
 
-```python
-def save_entry(self, entry_data: Dict[str, Any]) -> bool:
-    try:
-        # Validate required fields
-        if not all(key in entry_data for key in ['entry_id', 'timestamp_created', 'timestamp_modified', 'text_content']):
-            raise ValueError("Entry data missing required fields")
-        
-        # Create filename and save entry
-        filename = f"entry_{entry_data['entry_id']}.json"
-        file_path = self.entries_dir / filename
-        
-        # Add save timestamp
-        entry_data['timestamp_saved'] = datetime.now().isoformat()
-        
-        # Write entry to file
-        with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(entry_data, f, indent=2, ensure_ascii=False)
-        
-        return True
-    except Exception as e:
-        print(f"Error saving entry: {str(e)}")
-        return False
-```
+#### Editing Entries
+- The editor screen now supports both creating new entries and editing existing ones.
+- When editing, the original entry's `entry_id` and `timestamp_created` are preserved.
+- The editor is pre-filled with the selected entry's data when accessed from the view screen.
+- On save, the entry is updated in place, and the main screen is refreshed to reflect changes.
+- The editor resets its state after saving or canceling.
 
-Key features of the save functionality:
-- Required field validation
-- Automatic directory creation
-- UTF-8 encoding support
-- Save timestamp tracking
-- Error handling and reporting
-- JSON formatting with indentation
+#### Deleting Entries
+- The view screen provides a delete button for each entry.
+- On delete, the entry is removed from storage and the main screen is refreshed.
+- The delete action is immediate; a confirmation dialog can be added in the future for safety.
 
-### 3. Export Bundle Structure
+### 3. UI Synchronization
+- After editing or deleting an entry, the main screen's entry list is automatically refreshed.
+- The view and editor screens are visually consistent, with card-like layouts and clear sectioning.
+- The user experience is seamless: changes are reflected immediately without requiring a restart or manual refresh.
+
+### 4. Export Bundle Structure
 The export bundle is implemented as a ZIP archive with the following structure:
 ```
 diary_export_YYYYMMDD_HHMMSS.zip
@@ -69,7 +53,7 @@ diary_export_YYYYMMDD_HHMMSS.zip
     └── ...
 ```
 
-### 4. Manifest Implementation
+### 5. Manifest Implementation
 The manifest file (`manifest.json`) contains:
 - Export metadata (date, version)
 - List of all diary entries with their metadata
@@ -99,7 +83,7 @@ Example manifest structure:
 }
 ```
 
-### 5. Export Process Implementation
+### 6. Export Process Implementation
 The export process includes:
 - Timestamp-based bundle naming
 - ZIP file creation with compression
@@ -133,7 +117,7 @@ def create_export_bundle(self, output_path: str) -> bool:
         return False
 ```
 
-### 6. Error Handling
+### 7. Error Handling
 Comprehensive error handling was implemented:
 - File access and permission checks
 - JSON parsing validation
@@ -143,8 +127,9 @@ Comprehensive error handling was implemented:
 - Required field validation
 - Directory creation error handling
 - UTF-8 encoding support
+- Data integrity for edits and deletes
 
-### 7. Technical Decisions
+### 8. Technical Decisions
 
 1. **ZIP Format Selection**
    - Chose ZIP for universal compatibility
@@ -172,13 +157,15 @@ Comprehensive error handling was implemented:
    - Resource cleanup
    - Field validation
    - Directory management
+   - Data integrity for edits and deletes
 
-5. **Save Implementation**
+5. **Save & Edit Implementation**
    - JSON-based storage
    - UTF-8 encoding support
    - Required field validation
    - Automatic timestamp tracking
    - Error handling and reporting
+   - Editing preserves entry IDs and creation timestamps
 
 ## Testing
 The implementation was tested for:
@@ -191,9 +178,11 @@ The implementation was tested for:
 - Memory usage
 - Performance
 - Save functionality
+- Edit and delete functionality
 - Directory creation
 - Field validation
 - UTF-8 encoding
+- UI synchronization after edits and deletes
 
 ## Limitations and Future Improvements
 
@@ -220,10 +209,12 @@ The implementation was tested for:
    - Implement export preview
    - Add export history
    - Support for export templates
+   - Add confirmation dialogs for delete
+   - Add success/failure popups for save/edit/delete
 
-5. **Save Functionality**
-   - Add entry update functionality
-   - Implement entry deletion
+5. **Save & Edit Functionality**
+   - Add entry update functionality for partial edits
+   - Implement entry deletion confirmation
    - Add entry search capabilities
    - Support for entry versioning
 
@@ -235,5 +226,5 @@ Phase 6 will focus on integration, testing, and quality assurance, including:
 - Platform-specific testing
 - Performance optimization
 - Error handling refinement
-- Save functionality testing
+- Save, edit, and delete functionality testing
 - Directory management testing 
