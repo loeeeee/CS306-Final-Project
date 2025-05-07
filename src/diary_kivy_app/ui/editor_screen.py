@@ -211,11 +211,18 @@ class EditorScreen(Screen):
             "title": self.song_title.text.strip(),
             "artist": self.song_artist.text.strip()
         }
-        entry_id = uuid.uuid4().hex
+
+        # If editing, use the original entry_id and timestamp_created
+        if self.current_entry:
+            entry_id = self.current_entry.entry_id
+            timestamp_created = self.current_entry.timestamp_created
+        else:
+            entry_id = uuid.uuid4().hex
+            timestamp_created = datetime.now().isoformat()
         now = datetime.now().isoformat()
         entry = DiaryEntry(
             entry_id=entry_id,
-            timestamp_created=now,
+            timestamp_created=timestamp_created,
             timestamp_modified=now,
             text_content=text_content,
             location_data=location,
@@ -233,7 +240,11 @@ class EditorScreen(Screen):
         success = exporter.save_entry(entry.to_dict())
         if success:
             print("Entry saved successfully.")
+            # Refresh main screen entries before switching
+            main_screen = self.manager.get_screen('main')
+            main_screen.load_entries()
             self.manager.current = 'main'
+            self.current_entry = None  # Reset after save
         else:
             print("Failed to save entry.")
 
