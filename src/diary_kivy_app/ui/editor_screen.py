@@ -16,6 +16,9 @@ from ..core_logic.metadata_collector import MetadataCollector
 import os
 from datetime import datetime
 import platform
+from ..core_logic.data_model import DiaryEntry
+from ..core_logic.diary_exporter import DiaryExporter
+import uuid
 
 class EditorScreen(Screen):
     def __init__(self, **kwargs):
@@ -195,8 +198,44 @@ class EditorScreen(Screen):
 
     def on_save(self, instance):
         """Handle save button press."""
-        # TODO: Implement save functionality
-        self.manager.current = 'main'
+        # Collect entry data from UI
+        text_content = self.text_input.text.strip()
+        if not text_content:
+            print("Diary entry text is required.")
+            return
+
+        # Compose metadata
+        location = self.metadata_collector.get_current_location()
+        weather = self.metadata_collector.get_weather_data()
+        song = {
+            "title": self.song_title.text.strip(),
+            "artist": self.song_artist.text.strip()
+        }
+        entry_id = uuid.uuid4().hex
+        now = datetime.now().isoformat()
+        entry = DiaryEntry(
+            entry_id=entry_id,
+            timestamp_created=now,
+            timestamp_modified=now,
+            text_content=text_content,
+            location_data=location,
+            weather_data=weather,
+            environment_photo_path=self.env_photo_path,
+            selfie_photo_path=self.selfie_photo_path,
+            song_of_the_day=song
+        )
+
+        # Save entry using DiaryExporter
+        data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), '../../data')
+        entries_dir = os.path.join(data_dir, 'diary_entries')
+        media_dir = os.path.join(data_dir, 'media')
+        exporter = DiaryExporter(entries_dir, media_dir)
+        success = exporter.save_entry(entry.to_dict())
+        if success:
+            print("Entry saved successfully.")
+            self.manager.current = 'main'
+        else:
+            print("Failed to save entry.")
 
     def on_cancel(self, instance):
         """Handle cancel button press."""

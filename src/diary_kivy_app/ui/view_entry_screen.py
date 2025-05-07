@@ -102,5 +102,36 @@ class ViewEntryScreen(Screen):
         self.manager.current = 'main'
 
     def load_entry(self, entry_id):
-        # TODO: Load entry data and populate UI
-        pass 
+        from ..core_logic.storage_manager import read_entry
+        entry = read_entry(entry_id)
+        if not entry:
+            self.entry_text.text = "Entry not found."
+            self.location_label.text = "Not set"
+            self.weather_label.text = "Not set"
+            self.env_photo.source = ''
+            self.selfie.source = ''
+            self.song_label.text = "Not set"
+            return
+        self.entry_text.text = entry.text_content
+        # Location
+        loc = entry.location_data
+        if loc and loc.get('latitude') is not None:
+            self.location_label.text = f"Lat: {loc.get('latitude')}, Lon: {loc.get('longitude')}"
+        else:
+            self.location_label.text = "Not set"
+        # Weather
+        weather = entry.weather_data
+        if weather and weather.get('temperature') is not None:
+            self.weather_label.text = f"{weather.get('temperature')}°C, {weather.get('humidity')}% humidity"
+        else:
+            self.weather_label.text = "Not set"
+        # Environment Photo
+        self.env_photo.source = entry.environment_photo_path or ''
+        # Selfie
+        self.selfie.source = entry.selfie_photo_path or ''
+        # Song
+        song = entry.song_of_the_day
+        if song and (song.get('title') or song.get('artist')):
+            self.song_label.text = f"{song.get('title', '')} - {song.get('artist', '')}"
+        else:
+            self.song_label.text = "Not set" 

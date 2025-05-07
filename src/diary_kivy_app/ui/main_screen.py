@@ -49,6 +49,33 @@ class MainScreen(Screen):
     def on_settings(self, instance):
         self.manager.current = 'settings'
 
+    def view_entry(self, entry_id):
+        view_screen = self.manager.get_screen('view')
+        view_screen.load_entry(entry_id)
+        self.manager.current = 'view'
+
     def load_entries(self):
-        # TODO: Load entries from storage and populate entries_layout
-        pass 
+        """Load entries from storage and populate entries_layout."""
+        from ..core_logic.storage_manager import list_entries
+        from kivy.uix.boxlayout import BoxLayout
+        from kivy.uix.label import Label
+        from kivy.uix.button import Button
+        from kivy.metrics import dp
+
+        # Clear previous entries
+        self.entries_layout.clear_widgets()
+        entries = list_entries()
+        if not entries:
+            self.entries_layout.add_widget(Label(text="No diary entries yet.", size_hint_y=None, height=dp(40)))
+            return
+        for entry in entries:
+            entry_box = BoxLayout(orientation='horizontal', size_hint_y=None, height=dp(60), spacing=dp(10))
+            entry_label = Label(text=entry.text_content[:40] + ("..." if len(entry.text_content) > 40 else ""), halign='left', valign='middle')
+            view_btn = Button(text="View", size_hint_x=0.2)
+            view_btn.bind(on_press=lambda inst, eid=entry.entry_id: self.view_entry(eid))
+            entry_box.add_widget(entry_label)
+            entry_box.add_widget(view_btn)
+            self.entries_layout.add_widget(entry_box)
+
+    def on_pre_enter(self, *args):
+        self.load_entries() 
