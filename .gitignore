@@ -178,3 +178,4 @@ cython_debug/
 data/
 *.mp4
 docs/*.odt
+!buildozer.spec
