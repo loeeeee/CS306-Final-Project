@@ -1,6 +1,7 @@
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
 from kivy.lang import Builder
+from kivy.core.window import Window
 
 from ui.main_screen import MainScreen
 from ui.editor_screen import EditorScreen
@@ -9,6 +10,7 @@ from ui.settings_screen import SettingsScreen
 
 class DiaryApp(App):
     def build(self):
+        Window.size = (900, 900)
         # Load KV files
         Builder.load_file('ui/main_screen.kv')
         

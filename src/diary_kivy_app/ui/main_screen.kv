@@ -7,14 +7,25 @@
         Rectangle:
             pos: self.pos
             size: self.size
+    BoxLayout:
+        size_hint_y: None
+        height: '60dp'
+        Label:
+            text: 'My Diary'
+            font_size: '28sp'
+            bold: True
+            color: 0, 0, 0, 1
+            halign: 'center'
+            valign: 'middle'
 
 <Button>:
-    background_color: 0.2, 0.6, 0.8, 1  # Blue color
+    background_normal: ''
+    background_color: 0.1, 0.4, 0.7, 1  # Darker blue color
     color: 1, 1, 1, 1  # White text
-    font_size: '16sp'
+    font_size: '20sp'
     size_hint_y: None
     height: '48dp'
 
 <Label>:
-    color: 0.2, 0.2, 0.2, 1  # Dark gray text
-    font_size: '16sp' 
+    color: 0, 0, 0, 1  # Pure black text
+    font_size: '20sp' 
