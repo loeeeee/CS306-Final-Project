@@ -184,6 +184,45 @@ The exported bundle includes:
 - 100MB free storage space required
 - Some features may be limited based on device capabilities
 
+## Acknowledgments
+
+We would like to express our gratitude to the following open-source projects and tools that made this application possible:
+
+### Core Technologies
+- **Python 3.12**: The programming language that powers our application
+- **Kivy Framework**: For cross-platform UI development
+- **Plyer**: For accessing device features like camera, GPS, and sensors
+
+### Development Tools
+- **Buildozer**: For Android application packaging
+- **PyInstaller**: For desktop application packaging
+- **SQLite**: For local data storage
+- **Pillow**: For image processing
+- **Pandoc**: For documentation generation
+
+### Testing and Quality Assurance
+- **pytest**: For unit testing
+- **Kivy's Test Suite**: For UI testing
+- **Git**: For version control
+
+## References
+
+### Documentation
+1. Kivy Documentation: https://kivy.org/doc/stable/
+2. Python Documentation: https://docs.python.org/3.12/
+3. Plyer Documentation: https://plyer.readthedocs.io/
+4. Buildozer Documentation: https://buildozer.readthedocs.io/
+
+### Technical Resources
+1. SQLite Documentation: https://www.sqlite.org/docs.html
+2. Pillow Documentation: https://pillow.readthedocs.io/
+3. PyInstaller Documentation: https://pyinstaller.org/
+
+### Community Support
+- Kivy Forum: https://kivy.org/#forum
+- Python Community: https://www.python.org/community/
+- Stack Overflow: https://stackoverflow.com/
+
 ---
 
 For additional support or to report issues, please visit our project repository or contact the development team. 
